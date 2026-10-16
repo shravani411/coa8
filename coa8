@@ -1,0 +1,59 @@
+import math
+
+# --- Cache Configuration Parameters ---
+main_memory_size = 4 * 1024 * 1024
+cache_size = 16 * 1024
+block_size = 8
+
+address_bits = int(math.log2(main_memory_size))
+print(f"Total Address Bits: {address_bits} bits")
+
+num_cache_lines = cache_size // block_size
+line_bits = int(math.log2(num_cache_lines))
+block_offset_bits = int(math.log2(block_size))
+tag_bits = address_bits - (line_bits + block_offset_bits)
+
+print("\n--- Cache Parameters ---")
+print(f"Main Memory Size : {main_memory_size / (1024 * 1024)} MB")
+print(f"Cache Size : {cache_size / 1024} KB")
+print(f"Block Size : {block_size} Bytes")
+print(f"Number of Lines : {num_cache_lines} (2**{line_bits})")
+print(f"Address Bits : {address_bits}")
+print(f"Tag Bits : {tag_bits}")
+print(f"Line Bits : {line_bits}")
+print(f"Block Offset Bits: {block_offset_bits}")
+
+# --- DIRECT MAPPING ---
+print("\n--- DIRECT MAPPING ---")
+print(f"Address Format: | TAG ({tag_bits} bits) | LINE NO ({line_bits} bits) | BLOCK OFFSET ({block_offset_bits} bits) |")
+
+def direct_map(address):
+    block_offset = address & ((1 << block_offset_bits) - 1)
+    line_no = (address >> block_offset_bits) & ((1 << line_bits) - 1)
+    tag = address >> (block_offset_bits + line_bits)
+    return tag, line_no, block_offset
+
+address = 0b1010011101011010110011
+tag, line_no, offset = direct_map(address)
+print(f"\nExample Address: {bin(address)}")
+print(f"Tag: {tag:08b} | Line No: {line_no:011b} | Offset: {offset:03b}")
+
+# --- FULLY ASSOCIATIVE MAPPING ---
+print("\n--- FULLY ASSOCIATIVE MAPPING ---")
+print("No line number field (all blocks can go anywhere).")
+fully_tag_bits = address_bits - block_offset_bits
+print(f"Tag Bits: {fully_tag_bits} | Block Offset Bits: {block_offset_bits}")
+
+# --- K-WAY SET ASSOCIATIVE MAPPING ---
+K = 4
+num_sets = num_cache_lines // K  # Corrected formula
+set_bits = int(math.log2(num_sets))
+tag_bits_kway = address_bits - (set_bits + block_offset_bits)
+
+print("\n--- K-WAY SET ASSOCIATIVE MAPPING ---")
+print(f"K = {K}")
+print(f"Number of Sets = {num_sets} (2**{set_bits})")
+print(f"Tag Bits = {tag_bits_kway}")
+print(f"Set Bits = {set_bits}")
+print(f"Block Offset Bits = {block_offset_bits}")
+print(f"Address Format: | TAG ({tag_bits_kway} bits) | SET NO ({set_bits} bits) | OFFSET ({block_offset_bits} bits) |")
