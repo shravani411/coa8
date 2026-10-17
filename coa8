@@ -1,6 +1,5 @@
 import math
 
-# --- Cache Configuration Parameters ---
 main_memory_size = 4 * 1024 * 1024
 cache_size = 16 * 1024
 block_size = 8
